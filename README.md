@@ -10,6 +10,88 @@ This project develops a systematic multi-asset trading strategy combining:
 
 The objective is to **allocate capital dynamically across assets** by balancing expected return and predicted risk.
 
+## Asset Universe
+
+The strategy is implemented on a diversified set of liquid ETFs representing major asset classes:
+
+* **Equities:** SPY (S&P 500), QQQ (Nasdaq 100), IWM (Russell 2000), EFA (Developed Markets), EEM (Emerging Markets)
+* **Fixed Income:** TLT (Long-Term Treasury Bonds)
+* **Commodities:** GLD (Gold)
+* **Real Estate:** VNQ (REITs)
+
+### Rationale
+
+* Provides exposure across **global equities, rates, commodities, and real estate**
+* Ensures **liquidity and tradability**
+* Allows the model to learn **cross-asset relationships and diversification effects**
+
+This multi-asset setup enables the strategy to capture **relative value opportunities across asset classes**, rather than relying on a single market.
+
+## Model Architecture
+
+The strategy combines two models with distinct roles:
+
+---
+
+### Alpha Model — Return Prediction
+
+* **Model:** Random Forest Regressor
+* **Input:** Cross-sectional features (momentum, volatility, skewness, mean-reversion signals)
+* **Output:** Predicted 21-day forward return for each asset
+
+**Key Characteristics:**
+
+* Captures nonlinear relationships between features and returns
+* Robust to noise and overfitting due to ensemble averaging
+* Used for **ranking assets cross-sectionally**
+
+---
+
+### Risk Model — Volatility Forecasting
+
+* **Model:** Long Short-Term Memory (LSTM) Neural Network
+* **Input:** Sequences of past features (20-day window)
+* **Output:** Predicted future realized volatility
+
+**Why LSTM:**
+
+* Captures **temporal dependencies** in financial time series
+* Learns patterns such as:
+
+  * Volatility clustering
+  * Market regime shifts
+  * Nonlinear dynamics
+
+---
+
+### Combined Signal
+
+The final portfolio weights are determined by combining both models:
+
+[
+\text{Weight} \propto \frac{\text{Predicted Return}}{\text{Predicted Volatility}}
+]
+
+This results in:
+
+* Higher allocation to assets with **strong expected returns**
+* Lower exposure to assets with **high predicted risk**
+
+---
+
+### Training Framework
+
+* Walk-forward training (no look-ahead bias)
+* Models retrained at each rebalance step using historical data
+* Strict out-of-sample evaluation
+
+---
+
+### Key Insight
+
+While the alpha model demonstrates consistent predictive power, the volatility model primarily improves **risk control**, with limited impact on overall return enhancement.
+
+
 ---
 
 ## Strategy Architecture
