@@ -68,9 +68,7 @@ The strategy combines two models with distinct roles:
 
 The final portfolio weights are determined by combining both models:
 
-[
-\text{Weight} \propto \frac{\text{Predicted Return}}{\text{Predicted Volatility}}
-]
+Weight ∝ Expected Return ÷ Risk
 
 This results in:
 
